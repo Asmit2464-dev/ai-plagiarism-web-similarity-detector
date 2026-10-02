@@ -8,10 +8,9 @@ import ProgressBar from '../components/ProgressBar';
 import toast from 'react-hot-toast';
 import { FiUploadCloud, FiSettings, FiCheckCircle, FiTrash2, FiEdit3, FiMic, FiMicOff } from 'react-icons/fi';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url
-).toString();
+pdfjsLib.GlobalWorkerOptions.workerSrc = window.location?.origin
+  ? `${window.location.origin}/pdf.worker.min.mjs`
+  : `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
 function Upload() {
   const navigate = useNavigate();
@@ -177,7 +176,8 @@ function Upload() {
           summary: result.summary,
           matched_sources: result.matched_sources,
           highlights: result.highlights,
-          originalText: text
+          originalText: text,
+          ai_score: result.aiScore ?? result.ai_score ?? 0,
         }
       });
     } catch (error) {
