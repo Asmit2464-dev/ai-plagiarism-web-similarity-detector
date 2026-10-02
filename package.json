@@ -1,0 +1,22 @@
+{
+  "name": "plagio-check",
+  "version": "1.0.0",
+  "description": "Full-Stack AI & Web Plagiarism Detection System",
+  "scripts": {
+    "dev": "npm run start:backend",
+    "start:backend": "npm start --prefix backend",
+    "start:frontend": "npm start --prefix frontend",
+    "start:ml": "python ml/app.py",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend && pip install -r ml/requirements.txt"
+  },
+  "keywords": [
+    "plagiarism-checker",
+    "fastapi",
+    "react",
+    "express",
+    "nlp",
+    "ai-detector"
+  ],
+  "author": "",
+  "license": "ISC"
+}
