@@ -1,207 +1,279 @@
 # 🔍 Plag-Check — Full-Stack AI & Web Plagiarism Detection System
 
-Plag-Check is a full-stack, microservice-based text analysis platform that scans text, code, and documents for plagiarized content across the live internet, and evaluates text for AI-generated patterns (ChatGPT, Claude, Gemini).
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)](https://expressjs.com/)
+[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+
+**Plag-Check** is a full-stack, microservice-based content integrity platform that scans natural language, source code, and multi-format documents for web plagiarism using real-time internet search, while simultaneously analyzing text for AI-generated patterns (ChatGPT, Claude, Gemini).
 
 ---
 
-## ✨ Features & Capabilities
+## 🌟 Key Features
 
-- 🌐 **Live Web Plagiarism Engine**:
-  - Crawls and searches the live internet using the **Tavily AI Search Engine**.
-  - Ranks matching sources and returns direct **source URLs**, page titles, and similarity percentages.
-  - Sentence-level granularity: Highlights exact matching sentences with their corresponding web sources.
+### 1. 🌐 Live Web Plagiarism Detection
+- Crawls and searches live web pages using the **Tavily AI Search Engine**.
+- Computes sentence-level matching percentages using **TF-IDF Vectorization** and **Cosine Similarity**.
+- Generates interactive sentence highlight cards linking directly to the matched web URLs.
 
-- 🤖 **AI Content Probability Detector**:
-  - Evaluates text using 4 NLP heuristics to detect LLM-authored text:
-    1. **Sentence Burstiness & Uniformity**: Analyzes sentence length variance.
-    2. **Perplexity Proxy**: Measures lexical diversity and unique-to-total word ratios.
-    3. **AI Keyword Scanner**: Identifies common LLM buzzwords and phrase structures.
-    4. **Transition Word Density**: Evaluates connective word frequencies.
+### 2. 🤖 AI-Generated Content Probability Detection
+Evaluates text through a 4-pillar NLP heuristic scoring pipeline:
+1. **Sentence Burstiness & Uniformity:** Analyzes variance in sentence lengths (LLMs exhibit low variance).
+2. **Perplexity Proxy (Lexical Diversity):** Measures unique-to-total word ratios across vocabulary.
+3. **AI Keyword Footprint:** Scans for common LLM buzzwords (*delve*, *testament*, *tapestry*, *landscape*, etc.).
+4. **Transition Word Density:** Measures formal connective tissue frequency (*moreover*, *furthermore*, *consequently*).
 
-- 💻 **Programming Code Similarity Detector**:
-  - Automatically identifies code vs. natural language.
-  - Sanitizes comments (`# ...`) and string literals (`"..."`) to focus on structural code logic.
-  - Computes structural similarity using TF-IDF vectorization.
+### 3. 💻 Programming Code Similarity Analysis
+- Automatically detects programming code vs. natural language.
+- Sanitizes comments (`# ...`) and string literals (`"..."`) to focus strictly on structural programming logic.
+- Calculates structural similarity matrices using TF-IDF across source code snippets.
 
-- 📄 **Multi-Format Document Parsing**:
-  - Upload `.pdf`, `.docx`, and `.txt` files.
-  - Parsed directly on the client side using `pdfjs-dist` (PDFs) and `mammoth` (Word documents).
+### 4. 📄 Document Parsing & Voice Dictation
+- **Multi-Format Upload:** Upload and parse `.pdf` (via `pdfjs-dist`), `.docx` (via `mammoth`), and `.txt` files directly on the client side.
+- **Voice-to-Text Input:** Dictate text directly in-browser using the native **Web Speech API**.
+- **Scan Filters:** Toggle options to automatically exclude quoted text and bibliographies/references.
 
-- 🎙️ **Voice-to-Text Input**:
-  - Dictate text or reference passages using browser-native **Web Speech API** (`SpeechRecognition`).
+### 5. 📊 Visual Analytics & PDF Reports
+- Interactive **Chart.js** doughnut charts displaying originality vs. similarity breakdowns.
+- One-click downloadable **PDF scan reports** generated via `jspdf`.
 
-- 📊 **Visual Analytics & PDF Export**:
-  - Interactive **Chart.js** doughnut charts showing originality vs. similarity breakdowns.
-  - One-click downloadable **PDF scan reports** generated via `jspdf`.
-
-- 🛡️ **Authentication & History (Optional)**:
-  - JWT-based authentication with `bcryptjs` password encryption.
-  - Persistent scan history stored in MongoDB.
-  - Graceful fallback: Plagiarism and AI scans work 100% even without MongoDB connected.
+### 6. 🛡️ Authentication & Scan Persistence (With Graceful Fallback)
+- JWT-based authentication with `bcryptjs` password encryption and Google OAuth 2.0 integration (`passport`).
+- **Zero-Downtime Fallback:** Plagiarism checks and AI detection run 100% in memory even without a MongoDB instance connected. MongoDB is only required to persist scan history across sessions.
 
 ---
 
-## 🏗️ System Architecture
+## 🏗️ Architecture Overview
 
-Plag-Check uses a **3-tier decoupled microservice architecture**:
+The system uses a decoupled **3-tier microservice architecture**:
 
 ```text
-┌─────────────────────────┐
-│     React Frontend      │  (Port 3000)
-│   (Upload, Charts, UI)  │
-└────────────┬────────────┘
-             │ HTTP / REST
-┌────────────▼────────────┐
-│   Node / Express API    │  (Port 5000)
-│ (Auth, Reports, Gateway)│
-└──────┬─────────────┬────┘
-       │             │
-       ▼             ▼
-┌─────────────┐ ┌───────────────────────────┐
-│   MongoDB   │ │    FastAPI ML Service     │  (Port 5001)
-│ (User / DB) │ │ (TF-IDF, NLP, Heuristics) │
-└─────────────┘ └─────────────┬─────────────┘
-                              │
-                              ▼
-                       ┌──────────────┐
-                       │  Tavily API  │ (Live Web Search)
-                       └──────────────┘
+┌────────────────────────────────┐
+│      React.js Frontend         │  (Port 3000)
+│   (Upload, Charts, PDF, UI)    │
+└───────────────┬────────────────┘
+                │ HTTP / REST
+┌───────────────▼────────────────┐
+│     Node.js / Express API      │  (Port 5000)
+│ (Gateway, Auth, Reports, Rate) │
+└───────┬────────────────┬───────┘
+        │                │
+        ▼                ▼
+┌──────────────┐  ┌──────────────────────────────────┐
+│   MongoDB    │  │       FastAPI ML Engine          │  (Port 5001)
+│ (Users / DB) │  │  (TF-IDF, NLP, Heuristics, NLTK) │
+└──────────────┘  └────────────────┬─────────────────┘
+                                   │
+                                   ▼
+                            ┌──────────────┐
+                            │  Tavily API  │ (Live Web Search)
+                            └──────────────┘
 ```
 
-| Service | Technology | Port | Responsibilities |
+| Service | Stack | Port | Responsibilities |
 | :--- | :--- | :--- | :--- |
-| **Frontend** | React, Tailwind, Chart.js | `3000` | UI, Document Parsing, Voice Dictation, PDF Export |
-| **Backend** | Node.js, Express, Mongoose | `5000` | Gateway, Authentication, MongoDB Persistence, Rate Limiting |
-| **ML Engine** | Python, FastAPI, Uvicorn, Scikit-learn, NLTK | `5001` | TF-IDF Vectorization, Cosine Similarity, AI Detection Heuristics, Web Crawling |
+| **Frontend** | React 19, Framer Motion, Chart.js, Tailwind/CSS | `3000` | UI, Document Parsing, Voice Dictation, PDF Report Export |
+| **Backend** | Node.js, Express, Passport, Mongoose, JWT | `5000` | Gateway routing, User Authentication, Report Persistence, Rate Limiting |
+| **ML Engine** | Python 3.12, FastAPI, Uvicorn, Scikit-learn, NLTK | `5001` | TF-IDF Vectorization, Cosine Similarity, AI Detection, Live Web Crawl |
 
 ---
 
-## 📁 Project Structure
+## 📁 Directory Structure
 
 ```text
-├── backend/                # Node.js Express API gateway
-│   ├── config/             # Passport & Email configurations
-│   ├── controllers/        # Check & Auth controllers
-│   ├── models/             # Mongoose schemas (User, Report, ApiKey)
-│   ├── routes/             # Express API routes
-│   ├── .env.example        # Backend environment variables template
+├── backend/
+│   ├── config/             # Passport OAuth & Nodemailer configurations
+│   ├── controllers/        # Check and Authentication controllers
+│   ├── models/             # Mongoose models (User, Report, ApiKey)
+│   ├── routes/             # Express API route handlers
+│   ├── .env.example        # Backend environment template
 │   ├── package.json        # Backend dependencies
-│   └── server.js           # Express server entry point
-├── frontend/               # React client application
-│   ├── public/             # Static public assets
-│   ├── src/                # React source code (components, pages, services)
+│   └── server.js           # Express API gateway entry point
+├── frontend/
+│   ├── public/             # Static web assets & icons
+│   ├── src/
+│   │   ├── components/     # UI components (ResultCard, Console, ProgressBar, etc.)
+│   │   ├── context/        # React Auth & Theme contexts
+│   │   ├── pages/          # App pages (Home, Results, Upload, History, Login)
+│   │   └── services/       # Axios API client
 │   ├── package.json        # Frontend dependencies
-│   └── vercel.json         # Vercel deployment config
-├── ml/                     # Python FastAPI NLP & ML microservice
-│   ├── app.py              # FastAPI application & NLP pipelines
+│   └── vercel.json         # Vercel deployment configuration
+├── ml/
+│   ├── app.py              # FastAPI service with TF-IDF, NLP & AI heuristics
 │   ├── requirements.txt    # Python dependencies
-│   └── .env.example        # ML environment variables template
+│   └── .env.example        # ML service environment template
 ├── .gitignore              # Git ignore rules
 ├── package.json            # Root workspace orchestration scripts
-└── README.md               # Documentation
+└── README.md               # Project documentation
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-
-- **Node.js** (v18+)
-- **Python** (v3.10+)
-- **MongoDB** *(Optional — service functions without MongoDB via memory fallback)*
+- **Node.js** (v18 or higher)
+- **Python** (v3.10 or higher)
+- **MongoDB** *(Optional — core scan features run in guest mode without DB)*
 
 ---
 
-### 1. Start the ML Service (FastAPI)
+### Step 1: Clone the Repository
+```bash
+git clone https://github.com/<your-username>/<your-repo-name>.git
+cd "plagcheck fast api"
+```
 
+---
+
+### Step 2: Start the ML Service (FastAPI)
 ```bash
 cd ml
 pip install -r requirements.txt
-cp .env.example .env     # Optional: add your TAVILY_API_KEY
+cp .env.example .env     # Optional: add your free TAVILY_API_KEY
 python app.py
 ```
-*ML Service will be running at `http://127.0.0.1:5001` with interactive API docs at `http://127.0.0.1:5001/docs`.*
+*The ML Service runs at `http://127.0.0.1:5001` with Swagger docs available at `http://127.0.0.1:5001/docs`.*
 
 ---
 
-### 2. Start the Backend Service (Node/Express)
-
+### Step 3: Start the Backend Service (Express Gateway)
+In a new terminal:
 ```bash
 cd backend
 npm install
 cp .env.example .env
 npm start
 ```
-*Backend API will be running at `http://localhost:5000`.*
+*The Express Gateway runs at `http://localhost:5000`.*
 
 ---
 
-### 3. Start the Frontend (React)
-
+### Step 4: Start the Frontend (React)
+In a third terminal:
 ```bash
 cd frontend
 npm install
 npm start
 ```
-*Frontend will open automatically at `http://localhost:3000`.*
+*The React application opens automatically at `http://localhost:3000`.*
 
 ---
 
-### ⚡ Shortcut (From Project Root)
-
-You can install all dependencies and start individual services from the root folder:
+### ⚡ Workspace Shortcuts (From Project Root)
+You can also launch or install services directly from the root folder:
 
 ```bash
-# Install all dependencies
+# Install dependencies across all services
 npm run install:all
 
-# Start individual services in separate terminals
-npm run start:ml         # Python FastAPI (Port 5001)
-npm run start:backend    # Express (Port 5000)
-npm run start:frontend   # React (Port 3000)
+# Run individual services
+npm run start:ml         # Starts FastAPI ML Engine (Port 5001)
+npm run start:backend    # Starts Express Gateway (Port 5000)
+npm run start:frontend   # Starts React Client (Port 3000)
 ```
 
 ---
 
-## 🔑 Environment Variables
+## 🔑 Environment Variables Configuration
 
 ### Backend (`backend/.env`)
-
 ```env
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/plagiarism-checker
 ML_SERVICE_URL=http://127.0.0.1:5001
 JWT_SECRET=your_jwt_secret_key
 SESSION_SECRET=your_session_secret
+
+# Optional: Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Optional: Email Verification & Password Reset
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_gmail_app_password
 ```
 
 ### ML Engine (`ml/.env`)
-
 ```env
 PORT=5001
+# Get a free key at https://tavily.com
 TAVILY_API_KEY=your_tavily_api_key_here
 ```
 
 ---
 
-## 📡 API Endpoints
+## 📡 API Reference
 
-### ML Service (FastAPI — Port 5001)
+### ML Service (FastAPI — `http://127.0.0.1:5001`)
 
-- `GET /health` — Health check endpoint.
-- `GET /docs` — Interactive OpenAPI (Swagger) documentation.
-- `POST /analyze` — Core plagiarism, similarity, and AI evaluation pipeline.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/health` | Health check endpoint (`{"status": "ok"}`) |
+| `GET` | `/docs` | Interactive Swagger UI API documentation |
+| `POST` | `/analyze` | Core plagiarism, similarity, and AI detection pipeline |
 
-### Backend Gateway (Express — Port 5000)
+#### Sample Request Body (`POST /analyze`)
+```json
+{
+  "text": "Machine learning algorithms automatically identify patterns in large datasets.",
+  "reference": "Machine learning algorithms can identify patterns in data automatically.",
+  "check_ai": true,
+  "check_web": true,
+  "exclude_quotes": false,
+  "exclude_bibliography": false
+}
+```
 
-- `POST /api/check` — Runs plagiarism check (calls ML service) and saves report to MongoDB.
-- `GET /api/history` — Fetches user's previous scan reports (auth required).
-- `POST /api/auth/register` — Creates user account.
-- `POST /api/auth/login` — Authenticates user and returns JWT token.
+#### Sample Response (`200 OK`)
+```json
+{
+  "score": 79.3,
+  "word_match": 77.78,
+  "sentence_match": 79.95,
+  "type_detected": "text",
+  "matched_sources": [
+    {
+      "url": "direct_comparison",
+      "title": "Reference Document",
+      "similarity_score": 79.3
+    }
+  ],
+  "highlights": [
+    {
+      "input_sentence": "Machine learning algorithms automatically identify patterns in large datasets.",
+      "matched_sentence": "Machine learning algorithms can identify patterns in data automatically.",
+      "score": 79.95
+    }
+  ],
+  "summary": "High plagiarism detected! Most content is copied.",
+  "ai_score": 12.5
+}
+```
+
+---
+
+### Backend Gateway (Express — `http://localhost:5000`)
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/check` | Runs plagiarism scan (calls ML engine) & saves report |
+| `GET` | `/api/history` | Retrieves logged-in user scan history (JWT required) |
+| `GET` | `/api/report/:id` | Fetches a specific scan report by ID |
+| `POST` | `/api/auth/register` | Creates a new user account |
+| `POST` | `/api/auth/login` | Authenticates user and returns JWT token |
+| `GET` | `/api/auth/me` | Validates JWT token and returns profile data |
+
+---
+
+## 🛡️ Security & Rate Limiting
+- **Rate Limiters:** Global limiter (100 req/15 min), check limiter (10 checks/min), and auth limiter (5 attempts/15 min) configured via `express-rate-limit`.
+- **Password Security:** Password salting and hashing using `bcryptjs`.
+- **CORS Protection:** Configured across all microservices for secure client-server communication.
 
 ---
 
 ## 📄 License
-
-This project is licensed under the ISC License.
+This project is open-source and licensed under the **ISC License**.
