@@ -9,6 +9,10 @@
 
 **Plag-Check** is a full-stack, microservice-based content integrity platform that scans natural language, source code, and multi-format documents for web plagiarism using real-time internet search, while simultaneously analyzing text for AI-generated patterns (ChatGPT, Claude, Gemini).
 
+
+
+🚀 **Live Demo:** https://ai-plagiarism-web-similarity-detect.vercel.app/
+
 ---
 
 ## 🌟 Key Features
